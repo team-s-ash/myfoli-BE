@@ -12,8 +12,12 @@ public class User {
     private Long user_id;
 
     private String username;
+
     private String password;
+
     private String email;
+
     private String role;
+
     private String created_at;
 }
