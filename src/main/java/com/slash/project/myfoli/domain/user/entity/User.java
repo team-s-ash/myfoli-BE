@@ -1,11 +1,15 @@
 package com.slash.project.myfoli.domain.user.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Getter
+@Table(name = "user_tbl")
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,5 +23,18 @@ public class User {
 
     private String role;
 
-    private String created_at;
+    private LocalDateTime created_at;
+
+    @Builder
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.role = this.role == null ? "USER" : this.role;
+        this.created_at = LocalDateTime.now();
+    }
 }
