@@ -2,6 +2,7 @@ package com.slash.project.myfoli.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -26,9 +27,9 @@ public class User {
     private LocalDateTime created_at;
 
     @Builder
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, PasswordEncoder passwordEncoder) {
         this.username = username;
-        this.password = password;
+        this.password = passwordEncoder.encode(password);
         this.email = email;
     }
 
