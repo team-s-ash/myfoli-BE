@@ -29,7 +29,7 @@ public class User {
     @Builder
     public User(String username, String password, String email, PasswordEncoder passwordEncoder) {
         this.username = username;
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
         this.email = email;
     }
 

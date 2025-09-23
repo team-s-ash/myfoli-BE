@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -19,7 +19,7 @@ public class AuthController {
     @PostMapping("/signup")
     public String signup(@RequestBody SignUpRequest signUpRequest) throws Exception{
         userAuthService.signUp(signUpRequest);
-        return "signup seccuss";
+        return "redirect:/";
     }
 
 }
