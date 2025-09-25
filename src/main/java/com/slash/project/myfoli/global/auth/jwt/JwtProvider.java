@@ -2,7 +2,10 @@ package com.slash.project.myfoli.global.auth.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.slash.project.myfoli.domain.auth.jwt.entity.RefreshToken;
+import com.slash.project.myfoli.domain.auth.jwt.repository.RefreshTokenRepository;
 import com.slash.project.myfoli.domain.auth.service.UserAuthService;
+import com.slash.project.myfoli.domain.user.entity.User;
 import com.slash.project.myfoli.domain.user.repository.UserRepository;
 import com.slash.project.myfoli.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -25,16 +29,17 @@ public class JwtProivder {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private static final Long EXPIRATION_TIME = 1000L * 60 * 60;
+    private static final Long ACCESS_EXPIRATION_TIME = 1000L * 60 * 60;
+    private static final Long REFRESH_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 7;
 
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
     private final String accessHeader = "Authorization";
     private final String refreshHeader = "Authorization-refresh";
     private static final String BEARER = "Bearer ";
-    private static final String CLAIN = "user_id";
+    private static final String CLAIM = "user_id";
 
-
+    private final RefreshTokenRepository refreshTokenRepository;
     private final UserAuthService userAuthService;
     private final UserRepository userRepository;
 
@@ -43,8 +48,8 @@ public class JwtProivder {
 
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME))
-                .withClaim(CLAIN, user_id)
+                .withExpiresAt(new Date(now.getTime() + ACCESS_EXPIRATION_TIME))
+                .withClaim(CLAIM, user_id)
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
@@ -53,7 +58,7 @@ public class JwtProivder {
 
         return JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME))
+                .withExpiresAt(new Date(now.getTime() + REFRESH_EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
@@ -107,6 +112,23 @@ public class JwtProivder {
             log.error("엑세스 토큰이 유효하지 않습니다.");
             return Optional.empty();
         }
+    }
+
+    public void saveRefreshToken(String email, String refreshToken) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        refreshTokenRepository.revokeAllByUserEmail(email);
+
+        RefreshToken token = RefreshToken.builder()
+                .token(refreshToken)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusDays(14))
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public void logout(String email) {
+        refreshTokenRepository.revokeAllByUserEmail(email);
     }
 
     /*
