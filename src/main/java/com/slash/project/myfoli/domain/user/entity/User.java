@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    private Long userId;
 
     private String username;
 
@@ -24,7 +24,7 @@ public class User {
 
     private String role;
 
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @Builder
     public User(String username, String password, String email, PasswordEncoder passwordEncoder) {
@@ -36,6 +36,6 @@ public class User {
     @PrePersist
     public void prePersist() {
         this.role = this.role == null ? "USER" : this.role;
-        this.created_at = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

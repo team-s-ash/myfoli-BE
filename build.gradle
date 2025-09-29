@@ -29,6 +29,11 @@ dependencies {
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+
+
+    //jwt
+    implementation 'com.auth0:java-jwt:4.5.0'
+
     //lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

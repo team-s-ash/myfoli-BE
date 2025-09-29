@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long image_id;
+    private Long imageId;
 
-    private Long post_id;
+    private Long postId;
 
-    private String file_name;
+    private String fileName;
 
-    private String file_path;
+    private String filePath;
 
-    private String uploaded_at;
+    private String uploadedAt;
 }

@@ -1,22 +1,16 @@
 package com.slash.project.myfoli.domain.auth.presentation.dto;
 
-
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
-@Getter
 @Builder
-public class SignUpRequest {
-
+@Getter
+public class LoginRequest {
     @NotBlank
-    private String username;
+    @Email
+    private String email;
     @NotBlank
     private String password;
-    @NotBlank
-    private String email;
-
-    private List<Long> categoryId;
 }

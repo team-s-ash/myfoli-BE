@@ -14,17 +14,17 @@ import lombok.NoArgsConstructor;
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long post_id;
+    private Long postId;
 
     private String title;
 
     private String content;
 
-    private int view_count;
+    private int viewCount;
 
-    private String created_at;
+    private String createdAt;
 
-    private String updated_at;
+    private String updatedAt;
 
     @Enumerated(EnumType.STRING)
     private Status status;

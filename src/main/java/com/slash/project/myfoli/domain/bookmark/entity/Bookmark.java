@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookmark_id;
+    private Long bookmarkId;
 
-    private Long user_id;
+    private Long userId;
 
-    private Long post_id;
+    private Long postId;
 
-    private String created_at;
+    private String createdAt;
 }

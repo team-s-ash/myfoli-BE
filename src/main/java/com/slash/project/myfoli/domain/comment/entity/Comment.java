@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long comment_id;
+    private Long commentId;
 
-    private Long user_id;
+    private Long userId;
 
-    private Long post_id;
+    private Long postId;
 
     private String content;
 
-    private String created_at;
+    private String createdAt;
 
-    private String updated_at;
+    private String updatedAt;
 }
