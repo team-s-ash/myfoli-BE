@@ -14,13 +14,17 @@ import com.slash.project.myfoli.domain.user.entity.User;
 import com.slash.project.myfoli.domain.user.repository.UserRepository;
 import com.slash.project.myfoli.global.auth.jwt.JwtProvider;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Slf4j
@@ -62,7 +66,6 @@ public class UserAuthService {
                     .category(category)
                     .build();
             userInterestRepository.save(ui);
-
         }
     }
 
@@ -89,4 +92,18 @@ public class UserAuthService {
                 .refreshToken(refreshToken)
                 .build();
     }
+
+    public void logout(String authorizationHeader) throws Exception{ // 1. baerer을 제거한다 2. email을 가져온다 3. 그대로 logout에 처박는다
+        Optional<String> accessTokenOp = jwtProvider.extractAccessToken(authorizationHeader);
+        Optional<String> email = accessTokenOp
+                .flatMap(accessToken -> jwtProvider.extractEmail(accessToken));
+        jwtProvider.logout(email.orElse("Email not found"));
+    }
+
+    /*
+    public String reissueToken(String refreshToken) throws Exception{
+        Optional<String> refeshTokenOp = jwtProvider.extractRefreshToken(refreshToken);
+
+    }
+     */
 }

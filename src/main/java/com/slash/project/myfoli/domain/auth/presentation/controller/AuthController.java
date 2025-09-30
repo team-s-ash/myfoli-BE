@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -34,8 +31,16 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody Logout) throws Exception{
-
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) throws Exception{
+        userAuthService.logout(authorizationHeader);
+        return ResponseEntity.ok("logout successful");
     }
+
+    /*
+    @GetMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody String refreshToken) throws Exception{
+        //userAuthService.
+    }
+     */
 }
