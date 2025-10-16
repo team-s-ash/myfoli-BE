@@ -15,6 +15,9 @@ import java.util.Optional;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
+    // 토큰 문자열로 리프레시 토큰 객체를 찾는 메서드
+    Optional<RefreshToken> findByToken(String token);
+
     Optional<RefreshToken> findByTokenAndRevokedFalse(String token);
 
     List<RefreshToken> findByUserAndRevokedFalse(User user);

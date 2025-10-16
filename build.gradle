@@ -29,7 +29,8 @@ dependencies {
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-
+    //mail service
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     //jwt
     implementation 'com.auth0:java-jwt:4.5.0'

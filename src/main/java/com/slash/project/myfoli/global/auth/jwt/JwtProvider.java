@@ -52,7 +52,7 @@ public class JwtProvider {
 
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(now.getTime() + 5000))//ACCESS_EXPIRATION_TIME))
                 .withClaim(USERID_CLAIM, userId)
                 .withClaim(EMAIL_CLAIM, email)
                 .sign(Algorithm.HMAC512(secretKey));
@@ -151,12 +151,24 @@ public class JwtProvider {
             JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
             return TokenValidationResult.VALID;
         } catch (TokenExpiredException e) {
+            log.warn("Expired JWT token: {}", e.getMessage());
             return TokenValidationResult.EXPIRED;
         } catch (SignatureVerificationException e) {
+            log.warn("Invalid JWT signature: {}", e.getMessage());
             return TokenValidationResult.INVALID_SIGNATURE;
         } catch (Exception e) {
+            log.warn("Invalid JWT token: {}", e.getMessage());
             return TokenValidationResult.MALFORMED;
         }
     }
 
+    public boolean isRefreshTokenValid(String token) {
+        if (validateToken(token) != TokenValidationResult.VALID) {
+            return false;
+        }
+
+        return refreshTokenRepository.findByToken(token)
+                .map(refreshToken -> !refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
+                .orElse(false);
+    }
 }

@@ -9,17 +9,17 @@ import com.slash.project.myfoli.domain.category.entity.Category;
 import com.slash.project.myfoli.domain.category.repository.CategoryRepository;
 import com.slash.project.myfoli.domain.interest.entity.UserInterest;
 import com.slash.project.myfoli.domain.interest.repository.UserInterestRepository;
-import com.slash.project.myfoli.domain.user.dto.UserDto;
+import com.slash.project.myfoli.domain.user.presentation.dto.UserDto;
 import com.slash.project.myfoli.domain.user.entity.User;
+import com.slash.project.myfoli.domain.auth.exception.RefreshTokenNotFoundException;
+import com.slash.project.myfoli.domain.auth.jwt.repository.RefreshTokenRepository;
 import com.slash.project.myfoli.domain.user.repository.UserRepository;
 import com.slash.project.myfoli.global.auth.jwt.JwtProvider;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ public class UserAuthService {
     private final UserInterestRepository userInterestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public void signUp(SignUpRequest signUpRequest) throws Exception{
         if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) { //이미 존재하는 email인지 확인
@@ -93,17 +94,37 @@ public class UserAuthService {
                 .build();
     }
 
-    public void logout(String authorizationHeader) throws Exception{ // 1. baerer을 제거한다 2. email을 가져온다 3. 그대로 logout에 처박는다
-        Optional<String> accessTokenOp = jwtProvider.extractAccessToken(authorizationHeader);
-        Optional<String> email = accessTokenOp
-                .flatMap(accessToken -> jwtProvider.extractEmail(accessToken));
-        jwtProvider.logout(email.orElse("Email not found"));
+    public void logout(Authentication authentication) {
+        if (authentication == null) {
+            log.warn("Logout attempt with no authentication.");
+            return;
+        }
+        // Authentication 객체에서 사용자의 이메일(principal의 name)을 가져옴
+        String email = authentication.getName();
+        jwtProvider.logout(email);
+        log.info("User logged out successfully: {}", email);
     }
 
-    /*
-    public String reissueToken(String refreshToken) throws Exception{
-        Optional<String> refeshTokenOp = jwtProvider.extractRefreshToken(refreshToken);
 
+    public LoginResponse reissueToken(String refreshToken) {
+        String token = jwtProvider.extractRefreshToken(refreshToken)
+                .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found in header"));
+
+        if (!jwtProvider.isRefreshTokenValid(token)) {
+            throw new RefreshTokenNotFoundException("Invalid or expired refresh token");
+        }
+
+        User user = refreshTokenRepository.findByToken(token)
+                .map(com.slash.project.myfoli.domain.auth.jwt.entity.RefreshToken::getUser)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found for the given refresh token"));
+
+        String newAccessToken = jwtProvider.createAccessToken(user.getUserId(), user.getEmail());
+
+        return LoginResponse.builder()
+                .userDto(UserDto.from(user))
+                .accessToken(newAccessToken)
+                .refreshToken(token) // 기존 리프레시 토큰을 그대로 반환
+                .build();
     }
-     */
+
 }
