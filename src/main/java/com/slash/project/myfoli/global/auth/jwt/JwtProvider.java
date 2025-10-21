@@ -52,7 +52,7 @@ public class JwtProvider {
 
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + 5000))//ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(now.getTime() + ACCESS_EXPIRATION_TIME))//ACCESS_EXPIRATION_TIME))
                 .withClaim(USERID_CLAIM, userId)
                 .withClaim(EMAIL_CLAIM, email)
                 .sign(Algorithm.HMAC512(secretKey));
@@ -140,7 +140,12 @@ public class JwtProvider {
         refreshTokenRepository.save(token);
     }
 
+    /**
+     * 로그아웃을 처리하는 메서드
+     * @param email 사용자의 이메일
+     */
     public void logout(String email) {
+        // 사용자의 모든 리프레시 토큰을 무효화
         refreshTokenRepository.revokeAllByUserEmail(email);
     }
 
