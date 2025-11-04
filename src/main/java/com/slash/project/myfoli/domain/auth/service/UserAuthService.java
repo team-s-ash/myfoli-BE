@@ -95,13 +95,19 @@ public class UserAuthService {
                 .build();
     }
 
+    /**
+     * 로그아웃을 처리하는 메서드
+     * @param authentication 현재 인증된 사용자의 정보
+     */
     public void logout(Authentication authentication) {
+        // 인증 정보가 없으면 경고 로그를 남기고 종료
         if (authentication == null) {
             log.warn("Logout attempt with no authentication.");
             return;
         }
         // Authentication 객체에서 사용자의 이메일(principal의 name)을 가져옴
         String email = authentication.getName();
+        // JWT 프로바이더를 통해 로그아웃 처리 (리프레시 토큰 무효화)
         jwtProvider.logout(email);
         log.info("User logged out successfully: {}", email);
     }

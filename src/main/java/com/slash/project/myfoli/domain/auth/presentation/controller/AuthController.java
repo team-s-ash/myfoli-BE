@@ -4,16 +4,12 @@ import com.slash.project.myfoli.domain.auth.presentation.dto.LoginRequest;
 import com.slash.project.myfoli.domain.auth.presentation.dto.LoginResponse;
 import com.slash.project.myfoli.domain.auth.presentation.dto.SignUpRequest;
 import com.slash.project.myfoli.domain.auth.service.UserAuthService;
-import com.slash.project.myfoli.domain.user.service.UserService;
-import com.slash.project.myfoli.global.auth.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
