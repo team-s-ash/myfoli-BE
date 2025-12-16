@@ -9,11 +9,9 @@ import com.slash.project.myfoli.global.auth.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -34,8 +32,18 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody Logout) throws Exception{
-
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(Authentication authentication) {
+        // 현재 인증된 사용자의 정보를 기반으로 로그아웃 처리
+        userAuthService.logout(authentication);
+        return ResponseEntity.ok("logout successful");
     }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<LoginResponse> reissue(@RequestHeader("Authorization-refresh") String refreshToken) {
+        LoginResponse loginResponse = userAuthService.reissueToken(refreshToken);
+        return ResponseEntity.ok(loginResponse);
+    }
+
+
 }

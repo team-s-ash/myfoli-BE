@@ -1,4 +1,4 @@
-package com.slash.project.myfoli.domain.user.dto;
+package com.slash.project.myfoli.domain.user.presentation.dto;
 
 
 import com.slash.project.myfoli.domain.user.entity.User;

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,5 +19,5 @@ public class SignUpRequest {
     @NotBlank
     private String email;
 
-    private List<Long> categoryId;
+    private List<Long> categoryId = new ArrayList<>();
 }

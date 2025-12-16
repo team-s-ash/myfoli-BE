@@ -1,8 +1,7 @@
 package com.slash.project.myfoli.domain.auth.presentation.dto;
 
 
-import com.slash.project.myfoli.domain.user.dto.UserDto;
-import com.slash.project.myfoli.domain.user.entity.User;
+import com.slash.project.myfoli.domain.user.presentation.dto.UserDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

@@ -6,7 +6,6 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.slash.project.myfoli.domain.auth.jwt.entity.RefreshToken;
 import com.slash.project.myfoli.domain.auth.jwt.repository.RefreshTokenRepository;
-import com.slash.project.myfoli.domain.auth.service.UserAuthService;
 import com.slash.project.myfoli.domain.user.entity.User;
 import com.slash.project.myfoli.domain.user.repository.UserRepository;
 import com.slash.project.myfoli.global.auth.jwt.exception.TokenValidationResult;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -54,7 +52,7 @@ public class JwtProvider {
 
         return JWT.create()
                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + ACCESS_EXPIRATION_TIME))
+                .withExpiresAt(new Date(now.getTime() + ACCESS_EXPIRATION_TIME))//ACCESS_EXPIRATION_TIME))
                 .withClaim(USERID_CLAIM, userId)
                 .withClaim(EMAIL_CLAIM, email)
                 .sign(Algorithm.HMAC512(secretKey));
@@ -70,22 +68,6 @@ public class JwtProvider {
     }
 
 
-   // Access Token 재발급
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        response.setHeader(accessHeader, BEARER + accessToken);
-        log.info("Reissued Access Token : {}", accessToken);
-    }
-
-    // 로그인시 2가지 토큰 둘 다 전송
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken,String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        setAccessToken(response,accessToken);
-        setRefreshToken(response,refreshToken);
-        log.info("Reissued Refresh Token : {}", refreshToken);
-    }
 
     public void setAccessToken(HttpServletResponse response, String accessToken) {
         response.setHeader(accessHeader, BEARER + accessToken);
@@ -102,19 +84,23 @@ public class JwtProvider {
     }
 
     // 각각 AccessToken, RefreshToken, Email 정보를 추출하여 확인용으로 사용
-    public Optional<String> extractAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(accessToken -> accessToken.startsWith(BEARER))
-                .map(accessToken -> accessToken.replace(BEARER,""));
+
+
+    public Optional<String> extractAccessToken(String authorizationHeader) {
+        return Optional.ofNullable(authorizationHeader)
+                .filter(token -> token.startsWith(BEARER))
+                .map(token -> token.replace(BEARER, ""));
     }
 
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER,""));
+
+    public Optional<String> extractRefreshToken(String refreshHeader) {
+        return Optional.ofNullable(refreshHeader)
+                .filter(token -> token.startsWith(BEARER))
+                .map(token -> token.replace(BEARER, ""));
     }
 
     public Optional<String> extractEmail(String accessToken) {
+        log.info("Access Token : {}", accessToken);
         try {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
@@ -154,33 +140,40 @@ public class JwtProvider {
         refreshTokenRepository.save(token);
     }
 
+    /**
+     * 로그아웃을 처리하는 메서드
+     * @param email 사용자의 이메일
+     */
     public void logout(String email) {
+        // 사용자의 모든 리프레시 토큰을 무효화
         refreshTokenRepository.revokeAllByUserEmail(email);
     }
 
-    /*
-    public boolean isTokenValid(String token) {
-        try {
-            JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
-            return true;
-        } catch (Exception e) {
-            log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
-            return false;
-        }
-    }
-    */
+
     // 지피티식 업그레이드 -->
     public TokenValidationResult validateToken(String token) {
         try {
             JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
             return TokenValidationResult.VALID;
         } catch (TokenExpiredException e) {
+            log.warn("Expired JWT token: {}", e.getMessage());
             return TokenValidationResult.EXPIRED;
         } catch (SignatureVerificationException e) {
+            log.warn("Invalid JWT signature: {}", e.getMessage());
             return TokenValidationResult.INVALID_SIGNATURE;
         } catch (Exception e) {
+            log.warn("Invalid JWT token: {}", e.getMessage());
             return TokenValidationResult.MALFORMED;
         }
     }
 
+    public boolean isRefreshTokenValid(String token) {
+        if (validateToken(token) != TokenValidationResult.VALID) {
+            return false;
+        }
+
+        return refreshTokenRepository.findByToken(token)
+                .map(refreshToken -> !refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
+                .orElse(false);
+    }
 }
