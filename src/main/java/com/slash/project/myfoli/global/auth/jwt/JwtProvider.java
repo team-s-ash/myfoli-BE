@@ -26,7 +26,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class JwtProvider {
 
     @Value("${jwt.secret}")
@@ -68,7 +67,7 @@ public class JwtProvider {
     }
 
 
-
+    /*
     public void setAccessToken(HttpServletResponse response, String accessToken) {
         response.setHeader(accessHeader, BEARER + accessToken);
     }
@@ -82,9 +81,10 @@ public class JwtProvider {
 
         response.addCookie(cookie);
     }
+     */
+
 
     // 각각 AccessToken, RefreshToken, Email 정보를 추출하여 확인용으로 사용
-
 
     public Optional<String> extractAccessToken(String authorizationHeader) {
         return Optional.ofNullable(authorizationHeader)
@@ -167,11 +167,18 @@ public class JwtProvider {
         }
     }
 
+    /**
+     * 리프레시 토큰의 유효성을 검증하는 메서드
+     * @param token 리프레시 토큰
+     * @return 토큰이 유효하면 true, 그렇지 않으면 false
+     */
     public boolean isRefreshTokenValid(String token) {
+        // 토큰 자체의 유효성(만료, 서명 등)을 먼저 검증
         if (validateToken(token) != TokenValidationResult.VALID) {
             return false;
         }
 
+        // DB에서 토큰을 찾아보고, 만료되지 않았는지 확인
         return refreshTokenRepository.findByToken(token)
                 .map(refreshToken -> !refreshToken.getExpiresAt().isBefore(LocalDateTime.now()))
                 .orElse(false);
