@@ -22,13 +22,14 @@ public class UserService {
     // 내 정보 조회
     @Transactional(readOnly = true)
     public MyInfoResponse getMyInfo() {
-        // 현재 로그인한 사용자 정보 가져오기
+        // SecurityContextHolder에서 현재 인증된 사용자의 정보를 가져옵니다.
+        // JwtAuthenticationFilter에서 username 대신 email을 저장했으므로, getUsername()은 email을 반환합니다.
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
-        String username = userDetails.getUsername();
+        String email = userDetails.getUsername();
 
-        // 사용자 정보 조회
-        User user = userRepository.findByUsername(username)
+        // email을 사용하여 데이터베이스에서 사용자 정보를 조회합니다.
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // 사용자가 작성한 게시물 수 조회
