@@ -1,5 +1,6 @@
 package com.slash.project.myfoli.domain.post.entity;
 
+import com.slash.project.myfoli.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,8 @@ public class Post {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

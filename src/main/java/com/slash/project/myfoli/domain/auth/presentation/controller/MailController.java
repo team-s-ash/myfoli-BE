@@ -3,43 +3,40 @@ package com.slash.project.myfoli.domain.auth.presentation.controller;
 import com.slash.project.myfoli.domain.auth.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/mail")
 public class MailController {
     private final MailService mailService;
-    private int number; // 이메일 인증 숫자를 저장하는 변수
+    
 
     // 인증 이메일 전송
     @PostMapping("/mailSend")
-    public HashMap<String, Object> mailSend(String mail) {
+    public ResponseEntity<HashMap<String, Object>> mailSend(@RequestParam String mail) {
         HashMap<String, Object> map = new HashMap<>();
 
         try {
-            number = mailService.sendMail(mail);
-            String num = String.valueOf(number);
-
+            mailService.sendMail(mail);
             map.put("success", Boolean.TRUE);
-            map.put("number", num);
+            map.put("message", "Verification email sent successfully.");
         } catch (Exception e) {
             map.put("success", Boolean.FALSE);
             map.put("error", e.getMessage());
+            return ResponseEntity.internalServerError().body(map);
         }
 
-        return map;
+        return ResponseEntity.ok(map);
     }
 
     // 인증번호 일치여부 확인
     @GetMapping("/mailCheck")
-    public ResponseEntity<?> mailCheck(@RequestParam String userNumber) {
+    public ResponseEntity<?> mailCheck(@RequestParam String mail, @RequestParam String userNumber) {
 
-        boolean isMatch = userNumber.equals(String.valueOf(number));
+        boolean isMatch = mailService.verifyMailCode(mail, userNumber);
 
         return ResponseEntity.ok(isMatch);
     }
