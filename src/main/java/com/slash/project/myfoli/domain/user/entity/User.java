@@ -38,4 +38,8 @@ public class User {
         this.role = this.role == null ? "USER" : this.role;
         this.createdAt = LocalDateTime.now();
     }
+
+    public void updateUsername(String username) {
+        this.username = username;
+    }
 }
