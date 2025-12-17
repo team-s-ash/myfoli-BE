@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword()) // password는 실제 인증에 사용되지 않으므로 DB 값 그대로 전달
-                .roles("USER") // 역할(Role) 설정. 필요에 따라 DB에서 가져오도록 수정 가능
+                .roles(user.getRole()) // 역할(Role) 설정. 필요에 따라 DB에서 가져오도록 수정 가능
                 .build();
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
