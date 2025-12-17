@@ -17,13 +17,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
-    // 사용자 정보와 관련 카운트를 한 번의 쿼리로 조회하는 메서드
-    @Query("SELECT new com.slash.project.myfoli.domain.user.presentation.dto.MyInfoResponse(" +
-            "u.username, " +
-            "u.email, " +
-            "(SELECT COUNT(p) FROM Post p WHERE p.user = u), " +
-            "(SELECT COUNT(f) FROM Follow f WHERE f.following = u), " +
-            "(SELECT COUNT(f) FROM Follow f WHERE f.follower = u)) " +
-            "FROM User u WHERE u.email = :email")
-    Optional<MyInfoResponse> getMyInfoByEmail(@Param("email") String email);
 }
