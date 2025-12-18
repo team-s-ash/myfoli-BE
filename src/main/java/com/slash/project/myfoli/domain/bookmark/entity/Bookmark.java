@@ -19,6 +19,4 @@ public class Bookmark {
     private Long userId;
 
     private Long postId;
-
-    private String createdAt;
 }

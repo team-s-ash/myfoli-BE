@@ -21,8 +21,4 @@ public class Comment {
     private Long postId;
 
     private String content;
-
-    private String createdAt;
-
-    private String updatedAt;
 }

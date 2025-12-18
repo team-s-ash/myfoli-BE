@@ -23,10 +23,6 @@ public class Post {
 
     private int viewCount;
 
-    private String createdAt;
-
-    private String updatedAt;
-
     @Enumerated(EnumType.STRING)
     private Status status;
 
