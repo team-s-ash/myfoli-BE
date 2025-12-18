@@ -20,6 +20,4 @@ public class Like {
     private Long userId;
 
     private Long postId;
-
-    private String createdAt;
 }
