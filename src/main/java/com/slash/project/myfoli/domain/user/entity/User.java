@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Table(name = "user_tbl")
 @Entity
@@ -22,6 +24,8 @@ public class User {
 
     private String role;
 
+    private LocalDateTime createdAt;
+
     @Builder
     public User(String username, String password, String email, PasswordEncoder passwordEncoder) {
         this.username = username;
@@ -32,6 +36,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         this.role = this.role == null ? "USER" : this.role;
+        this.createdAt = LocalDateTime.now();
     }
 
     public void updateUsername(String username) {

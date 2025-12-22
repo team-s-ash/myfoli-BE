@@ -27,8 +27,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
-    runtimeOnly 'org.postgresql:postgresql'
-    //runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     //mail service
     implementation 'org.springframework.boot:spring-boot-starter-mail'

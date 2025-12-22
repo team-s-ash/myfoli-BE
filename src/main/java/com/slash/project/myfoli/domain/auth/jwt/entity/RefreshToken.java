@@ -21,6 +21,9 @@ public class RefreshToken {
     private String token; // 실제 JWT Refresh Token 값
     private LocalDateTime expiresAt; // 만료 시간
 
+    @Column(updatable = false)
+    private LocalDateTime createdAt; // 생성 시간
+
     private boolean revoked = false; // 강제 무효화 여부 (로그아웃 등)
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -32,6 +35,11 @@ public class RefreshToken {
         this.user = user;
         this.token = token;
         this.expiresAt = expiresAt;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 
     // === 비즈니스 로직 ===
