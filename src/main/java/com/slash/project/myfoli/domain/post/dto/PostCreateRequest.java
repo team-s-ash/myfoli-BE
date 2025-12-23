@@ -1,6 +1,5 @@
 package com.slash.project.myfoli.domain.post.dto;
 
-import com.slash.project.myfoli.domain.post.entity.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
