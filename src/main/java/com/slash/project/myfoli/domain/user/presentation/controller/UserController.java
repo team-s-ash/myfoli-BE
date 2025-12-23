@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/expire")
     public ResponseEntity<?> expire() {
-        return ResponseEntity.ok("api  answer successful");
+        return ResponseEntity.ok("api answer successful");
     }
 
     // 내 정보 조회 API

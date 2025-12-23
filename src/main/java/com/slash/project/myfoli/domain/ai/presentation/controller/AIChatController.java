@@ -9,7 +9,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
-@Controller
+@Controller("/api/ai")
 @RequiredArgsConstructor
 public class AIChatController {
     private final AIChatService chatService;
