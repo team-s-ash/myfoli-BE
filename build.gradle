@@ -33,6 +33,9 @@ dependencies {
     //mail service
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // OpenAI
+    implementation 'com.theokanning.openai-gpt3-java:service:0.18.2'
+
     //jwt
     implementation 'com.auth0:java-jwt:4.5.0'
 
@@ -44,6 +47,11 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
 }
 
 tasks.named('test') {
